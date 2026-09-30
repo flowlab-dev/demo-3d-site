@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern One by Candlewren (demo)</title>
+<meta name="description" content="Self-initiated Flow Lab demo: a product site with a live 3D scene and scroll-driven animation for an invented AI computer, Lantern One.">
+<meta name="theme-color" content="#ECEEEA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='5' y='3' width='22' height='26' rx='6' fill='%2314171B'/%3E%3Ccircle cx='16' cy='15' r='5' fill='%23F0A93B'/%3E%3C/svg%3E">
+<script>
+  // Set the theme before the first paint, so the page never flashes the wrong one
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('lantern-theme'); } catch (e) {}
+    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- The font loads without holding up the first paint; the system font shows until it arrives -->
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="assets/styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/",
+    "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.core.js": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.core.min.js"
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
+<script type="module" src="assets/scene.js" onerror="document.documentElement.classList.add('no-webgl');window.dispatchEvent(new Event('lantern:failed'))"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<p class="demo-band">
+  Self-initiated demo by <a href="https://flowlab-dev.github.io/">Flow Lab</a>. Candlewren and Lantern One are invented: nothing here is for sale.
+</p>
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="wordmark" href="#top" aria-label="Candlewren, back to top">Candlewren</a>
+    <nav aria-label="Sections">
+      <ul class="nav" role="list">
+        <li><a href="#inside">Inside</a></li>
+        <li><a href="#specs">Specs</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#reserve">Reserve</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch to dark theme">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="4.2" fill="currentColor"/><path d="M10 1.5v2.2M10 16.3v2.2M1.5 10h2.2M16.3 10h2.2M4 4l1.6 1.6M14.4 14.4 16 16M4 16l1.6-1.6M14.4 5.6 16 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" class="theme-toggle__rays"/></svg>
+    </button>
+  </div>
+</header>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="wrap hero__grid">
+      <div class="hero__text">
+        <p class="hero__product">Lantern One</p>
+        <h1 id="hero-title" class="hero__title">An AI computer that keeps your work in the room.</h1>
+        <p class="hero__lead">Lantern One runs large language models on your desk. Contracts, patient notes and unreleased work are read, summarised and searched without leaving the building.</p>
+        <div class="hero__actions">
+          <a class="button button--primary" href="#reserve">Reserve a unit</a>
+          <a class="button button--quiet" href="#inside">See inside</a>
+        </div>
+      </div>
+      <figure class="hero__art art" aria-hidden="true">
+        <svg viewBox="0 0 320 360" class="art__svg">
+          <defs>
+            <radialGradient id="glow-a" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFD58A"/><stop offset=".45" stop-color="#F0A93B" stop-opacity=".85"/><stop offset="1" stop-color="#F0A93B" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect x="70" y="60" width="180" height="230" rx="34" class="art__glass"/>
+          <circle cx="160" cy="165" r="70" fill="url(#glow-a)"/>
+          <circle cx="160" cy="165" r="24" fill="#FFE2A8"/>
+          <rect x="84" y="258" width="152" height="10" rx="5" class="art__board"/>
+          <rect x="92" y="290" width="136" height="22" rx="8" class="art__base"/>
+        </svg>
+      </figure>
+    </div>
+    <p class="wrap hero__hint" aria-hidden="true">Move the pointer or tilt your phone: the box follows.</p>
+  </section>
+
+  <section class="inside" id="inside" aria-labelledby="inside-title">
+    <div class="inside__pin">
+      <div class="wrap inside__grid">
+        <figure class="inside__art art" aria-hidden="true">
+          <svg viewBox="0 0 320 420" class="art__svg">
+            <defs>
+              <radialGradient id="glow-b" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFD58A"/><stop offset=".45" stop-color="#F0A93B" stop-opacity=".85"/><stop offset="1" stop-color="#F0A93B" stop-opacity="0"/></radialGradient>
+            </defs>
+            <rect x="70" y="20" width="180" height="120" rx="30" class="art__glass"/>
+            <circle cx="160" cy="190" r="56" fill="url(#glow-b)"/>
+            <circle cx="160" cy="190" r="20" fill="#FFE2A8"/>
+            <rect x="80" y="262" width="160" height="16" rx="6" class="art__board"/>
+            <path d="M96 270h128M110 262v16M150 262v16M190 262v16" class="art__traces"/>
+            <rect x="88" y="330" width="144" height="44" rx="10" class="art__base"/>
+            <path d="M106 338v28M122 338v28M138 338v28M154 338v28M170 338v28M186 338v28M202 338v28M218 338v28" class="art__fins"/>
+          </svg>
+        </figure>
+        <div class="inside__text">
+          <h2 id="inside-title" class="section-title">Four layers, one quiet box</h2>
+          <ol class="steps" role="list">
+            <li class="step" data-step="0">
+              <h3 class="step__title">Glass shell</h3>
+              <p class="step__body">Low-iron glass over a recycled aluminium frame. The light of the core shows how busy the machine is, so you never need a status screen.</p>
+            </li>
+            <li class="step" data-step="1">
+              <h3 class="step__title">The core</h3>
+              <p class="step__body">A neural processor with 128 GB of memory shared by every model you load. Brighter light means more work in progress.</p>
+            </li>
+            <li class="step" data-step="2">
+              <h3 class="step__title">Compute board</h3>
+              <p class="step__body">Storage for your documents and models, and two network ports that you can switch off for fully offline work.</p>
+            </li>
+            <li class="step" data-step="3">
+              <h3 class="step__title">Silent cooling</h3>
+              <p class="step__body">A copper vapour chamber and one slow fan keep it at 31 dB under full load, about as loud as a quiet library.</p>
+            </li>
+          </ol>
+          <div class="steps__progress" aria-hidden="true"><span class="steps__bar"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="specs" id="specs" aria-labelledby="specs-title">
+    <div class="wrap">
+      <h2 id="specs-title" class="section-title">Built for long days of work</h2>
+      <dl class="specs__list">
+        <div class="spec">
+          <dt class="spec__label">Unified memory for models and documents</dt>
+          <dd class="spec__value"><span data-count="128">128</span> GB</dd>
+        </div>
+        <div class="spec">
+          <dt class="spec__label">Parameters in the largest model it runs locally</dt>
+          <dd class="spec__value"><span data-count="70">70</span> B</dd>
+        </div>
+        <div class="spec">
+          <dt class="spec__label">Noise at full load</dt>
+          <dd class="spec__value"><span data-count="31">31</span> dB</dd>
+        </div>
+        <div class="spec">
+          <dt class="spec__label">Peak power, from a normal wall socket</dt>
+          <dd class="spec__value"><span data-count="240">240</span> W</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="privacy" id="privacy" aria-labelledby="privacy-title">
+    <div class="wrap split">
+      <div class="split__lead">
+        <h2 id="privacy-title" class="section-title">Nothing leaves the room</h2>
+        <p class="lead">Cloud AI means sending your files to someone else's servers. Lantern One reads them where they already are.</p>
+      </div>
+      <ul class="rows" role="list">
+        <li class="row">
+          <h3 class="row__title">Works offline</h3>
+          <p class="row__body">Unplug the network cable and everything still works: chat, search, summaries and transcription.</p>
+        </li>
+        <li class="row">
+          <h3 class="row__title">Your models stay yours</h3>
+          <p class="row__body">Fine-tune on your own documents. The weights are stored on the device and can be exported or wiped at any time.</p>
+        </li>
+        <li class="row">
+          <h3 class="row__title">A log you can read</h3>
+          <p class="row__body">Every question, file and answer is listed in plain language, so an auditor can see exactly what the machine did.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="uses" id="uses" aria-labelledby="uses-title">
+    <div class="wrap split">
+      <div class="split__lead">
+        <h2 id="uses-title" class="section-title">Made for work you cannot upload</h2>
+      </div>
+      <ul class="rows" role="list">
+        <li class="row">
+          <h3 class="row__title">Law firms</h3>
+          <p class="row__body">Search ten years of case files and draft first versions without privileged documents reaching a third party.</p>
+        </li>
+        <li class="row">
+          <h3 class="row__title">Clinics</h3>
+          <p class="row__body">Turn consultation recordings into notes on a machine that stays behind the clinic's own door.</p>
+        </li>
+        <li class="row">
+          <h3 class="row__title">Studios and publishers</h3>
+          <p class="row__body">Summarise manuscripts and scripts before release, with no risk of them turning up in someone's training data.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="reserve" id="reserve" aria-labelledby="reserve-title">
+    <div class="wrap split">
+      <div class="split__lead">
+        <h2 id="reserve-title" class="section-title">Reserve a Lantern One</h2>
+        <p class="lead">First units ship in spring. Reserving costs nothing, and you can cancel with one email.</p>
+        <p class="price"><span class="price__value">$4,800</span> <span class="price__note">per unit, with three years of updates</span></p>
+      </div>
+      <form class="form" id="reserve-form" novalidate>
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" autocomplete="name" maxlength="80" aria-describedby="f-name-error">
+          <p class="field__error" id="f-name-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="f-email">Work email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" aria-describedby="f-email-error">
+          <p class="field__error" id="f-email-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="f-team">Team size</label>
+          <select id="f-team" name="team" aria-describedby="f-team-error">
+            <option value="">Choose…</option>
+            <option value="1-10">1–10 people</option>
+            <option value="11-50">11–50 people</option>
+            <option value="51-200">51–200 people</option>
+            <option value="200+">More than 200</option>
+          </select>
+          <p class="field__error" id="f-team-error" hidden></p>
+        </div>
+        <button class="button button--primary form__submit" type="submit">Reserve a unit</button>
+        <div class="form__done" id="reserve-done" role="status" tabindex="-1" hidden></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="faq" id="faq" aria-labelledby="faq-title">
+    <div class="wrap split">
+      <div class="split__lead">
+        <h2 id="faq-title" class="section-title">Questions</h2>
+      </div>
+      <div class="faq__list">
+        <details class="faq__item">
+          <summary>Which models can it run?</summary>
+          <p>Open-weight language models up to about 70 billion parameters, speech-to-text and image models. New models install from a USB drive or, if you allow it, over the network.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Does it need an internet connection?</summary>
+          <p>Only for software updates, and you can install those from a USB drive instead. Everyday work happens entirely offline.</p>
+        </details>
+        <details class="faq__item">
+          <summary>How many people can use it at once?</summary>
+          <p>Around twenty people chatting at the same time, or five running long document jobs. Teams bigger than that usually add a second unit.</p>
+        </details>
+        <details class="faq__item">
+          <summary>What happens to the data if we return it?</summary>
+          <p>You wipe it from the settings screen before sending it back, or keep the storage module and we replace it at no cost.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <p class="wordmark wordmark--small">Candlewren</p>
+    <p class="site-footer__note">Candlewren, Lantern One and every number on this page are invented for a self-initiated demo. Design and code: <a href="https://flowlab-dev.github.io/">Flow Lab</a>.</p>
+    <a class="site-footer__top" href="#top">Back to top</a>
+  </div>
+</footer>
+<script src="assets/logic.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

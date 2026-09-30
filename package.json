@@ -1,0 +1,11 @@
+{
+  "name": "lanternfield-3d-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Product-site demo for an invented AI computer: a live three.js scene that opens up in layers as you scroll (GSAP ScrollTrigger). No build step.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test tests/*.test.js tests/*.test.mjs"
+  }
+}
